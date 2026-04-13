@@ -29,16 +29,17 @@ public class UserService implements IUserService {
         return Mapper.toDTO(userRepository.findById(id).orElseThrow(() -> new NotFoundException("User not found")));
     }
 
-    public UserDTO createUser(User user) {
+    public UserDTO createUser(UserDTO userDTO) {
+        User user = Mapper.toEntity(userDTO);
         userRepository.save(user);
         return Mapper.toDTO(user);
     }
 
-    public UserDTO updateUser(Long id, User user) {
+    public UserDTO updateUser(Long id, UserDTO userDTO) {
         User existingUser = userRepository.findById(id).orElseThrow(() -> new NotFoundException("User not found"));
-        existingUser.setUsername(user.getUsername());
-        existingUser.setPassword(user.getPassword());
-        existingUser.setRole(user.getRole());
+        existingUser.setUsername(userDTO.getUsername());
+        existingUser.setPassword(userDTO.getPassword());
+        existingUser.setRole(userDTO.getRole());
         userRepository.save(existingUser);
         return Mapper.toDTO(existingUser);
     }

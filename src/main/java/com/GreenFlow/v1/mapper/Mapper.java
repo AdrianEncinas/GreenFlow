@@ -16,4 +16,11 @@ public class Mapper {
                 .role(user.getRole())
                 .build();
     }
+
+    public static User toEntity(UserDTO userDTO) {
+        if (userDTO == null) {
+            return null;
+        }
+        return new User(userDTO.getId(), userDTO.getUsername(), userDTO.getPassword(), userDTO.getRole());
+    }
 }
