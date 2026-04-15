@@ -2,6 +2,7 @@ package com.GreenFlow.v1.service;
 
 import java.util.List;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.GreenFlow.v1.dto.UserDTO;
@@ -14,9 +15,11 @@ import com.GreenFlow.v1.respository.UserRepository;
 public class UserService implements IUserService {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public List<UserDTO> getAllUsers() {
@@ -31,6 +34,7 @@ public class UserService implements IUserService {
 
     public UserDTO createUser(UserDTO userDTO) {
         User user = Mapper.toEntity(userDTO);
+        user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
         userRepository.save(user);
         return Mapper.toDTO(user);
     }
@@ -38,8 +42,12 @@ public class UserService implements IUserService {
     public UserDTO updateUser(Long id, UserDTO userDTO) {
         User existingUser = userRepository.findById(id).orElseThrow(() -> new NotFoundException("User not found"));
         existingUser.setUsername(userDTO.getUsername());
-        existingUser.setPassword(userDTO.getPassword());
         existingUser.setRole(userDTO.getRole());
+
+        if (userDTO.getPassword() != null && !userDTO.getPassword().isBlank()) {
+            existingUser.setPassword(passwordEncoder.encode(userDTO.getPassword()));
+        }
+
         userRepository.save(existingUser);
         return Mapper.toDTO(existingUser);
     }

@@ -12,7 +12,6 @@ public class Mapper {
         return UserDTO.builder()
                 .id(user.getId())
                 .username(user.getUsername())
-                .password(user.getPassword())
                 .role(user.getRole())
                 .build();
     }

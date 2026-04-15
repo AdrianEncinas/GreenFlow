@@ -1,11 +1,7 @@
 package com.GreenFlow.v1.dto;
 
-import org.springframework.data.annotation.Id;
-
 import com.GreenFlow.v1.model.Role;
-
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -18,10 +14,11 @@ import lombok.Setter;
 @Builder
 public class UserDTO {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String username;
+
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
+
     private Role role;
 }
