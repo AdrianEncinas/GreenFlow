@@ -12,14 +12,13 @@ public final class SensorReadingPersistenceMapper {
         if (entity == null) {
             return null;
         }
-        return SensorReading.builder()
-                .id(entity.getId())
-                .sensorId(entity.getSensorId())
-                .temperature(entity.getTemperature())
-                .humidity(entity.getHumidity())
-                .co2Level(entity.getCo2Level())
-                .timestamp(entity.getTimestamp())
-                .build();
+        return new SensorReading(
+                entity.getId(),
+                entity.getSensorId(),
+                entity.getTemperature(),
+                entity.getHumidity(),
+                entity.getCo2Level(),
+                entity.getTimestamp());
     }
 
     public static SensorReadingEntity toEntity(SensorReading reading) {
@@ -27,12 +26,12 @@ public final class SensorReadingPersistenceMapper {
             return null;
         }
         return SensorReadingEntity.builder()
-                .id(reading.getId())
-                .sensorId(reading.getSensorId())
-                .temperature(reading.getTemperature())
-                .humidity(reading.getHumidity())
-                .co2Level(reading.getCo2Level())
-                .timestamp(reading.getTimestamp())
+                .id(reading.id())
+                .sensorId(reading.sensorId())
+                .temperature(reading.temperature())
+                .humidity(reading.humidity())
+                .co2Level(reading.co2Level())
+                .timestamp(reading.timestamp())
                 .build();
     }
 }

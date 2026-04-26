@@ -13,12 +13,12 @@ public final class SensorReadingWebMapper {
             return null;
         }
         return SensorReadingDTO.builder()
-                .id(reading.getId())
-                .sensorId(reading.getSensorId())
-                .temperature(reading.getTemperature())
-                .humidity(reading.getHumidity())
-                .co2Level(reading.getCo2Level())
-                .timestamp(reading.getTimestamp())
+                .id(reading.id())
+                .sensorId(reading.sensorId())
+                .temperature(reading.temperature())
+                .humidity(reading.humidity())
+                .co2Level(reading.co2Level())
+                .timestamp(reading.timestamp())
                 .build();
     }
 
@@ -26,13 +26,12 @@ public final class SensorReadingWebMapper {
         if (dto == null) {
             return null;
         }
-        return SensorReading.builder()
-                .id(dto.getId())
-                .sensorId(dto.getSensorId())
-                .temperature(dto.getTemperature())
-                .humidity(dto.getHumidity())
-                .co2Level(dto.getCo2Level())
-                .timestamp(dto.getTimestamp())
-                .build();
+        return new SensorReading(
+                dto.getId(),
+                dto.getSensorId(),
+                dto.getTemperature(),
+                dto.getHumidity(),
+                dto.getCo2Level(),
+                dto.getTimestamp());
     }
 }
