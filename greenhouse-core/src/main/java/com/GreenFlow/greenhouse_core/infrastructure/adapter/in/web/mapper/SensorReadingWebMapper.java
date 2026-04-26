@@ -1,12 +1,17 @@
-package com.GreenFlow.greenhouse_core.mapper;
+package com.GreenFlow.greenhouse_core.infrastructure.adapter.in.web.mapper;
 
-import com.GreenFlow.greenhouse_core.dto.SensorReadingDTO;
-import com.GreenFlow.greenhouse_core.model.SensorReading;
+import com.GreenFlow.greenhouse_core.domain.model.SensorReading;
+import com.GreenFlow.greenhouse_core.infrastructure.adapter.in.web.dto.SensorReadingDTO;
 
-public class SensorReadingMapper {
+public final class SensorReadingWebMapper {
 
-    public static SensorReadingDTO toDTO(SensorReading reading) {
-        if (reading == null) return null;
+    private SensorReadingWebMapper() {
+    }
+
+    public static SensorReadingDTO toDto(SensorReading reading) {
+        if (reading == null) {
+            return null;
+        }
         return SensorReadingDTO.builder()
                 .id(reading.getId())
                 .sensorId(reading.getSensorId())
@@ -17,8 +22,10 @@ public class SensorReadingMapper {
                 .build();
     }
 
-    public static SensorReading toEntity(SensorReadingDTO dto) {
-        if (dto == null) return null;
+    public static SensorReading toDomain(SensorReadingDTO dto) {
+        if (dto == null) {
+            return null;
+        }
         return SensorReading.builder()
                 .id(dto.getId())
                 .sensorId(dto.getSensorId())

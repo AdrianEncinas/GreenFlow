@@ -1,6 +1,6 @@
 package com.GreenFlow.greenhouse_core.config;
 
-import com.GreenFlow.greenhouse_core.model.SensorReading;
+import com.GreenFlow.greenhouse_core.domain.model.SensorReading;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.beans.factory.annotation.Value;

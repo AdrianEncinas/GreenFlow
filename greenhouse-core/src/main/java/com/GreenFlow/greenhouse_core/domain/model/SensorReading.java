@@ -1,23 +1,21 @@
-package com.GreenFlow.greenhouse_core.model;
+package com.GreenFlow.greenhouse_core.domain.model;
 
-import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.Instant;
 
-@Entity
-@Table(name = "sensor_readings")
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class SensorReading {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     private String sensorId;
     private double temperature;
     private double humidity;
