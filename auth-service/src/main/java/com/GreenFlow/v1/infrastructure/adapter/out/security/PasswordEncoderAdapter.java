@@ -1,0 +1,21 @@
+package com.GreenFlow.v1.infrastructure.adapter.out.security;
+
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Component;
+
+import com.GreenFlow.v1.application.port.out.PasswordEncoderPort;
+
+@Component
+public class PasswordEncoderAdapter implements PasswordEncoderPort {
+
+    private final PasswordEncoder passwordEncoder;
+
+    public PasswordEncoderAdapter(PasswordEncoder passwordEncoder) {
+        this.passwordEncoder = passwordEncoder;
+    }
+
+    @Override
+    public String encode(String rawPassword) {
+        return passwordEncoder.encode(rawPassword);
+    }
+}

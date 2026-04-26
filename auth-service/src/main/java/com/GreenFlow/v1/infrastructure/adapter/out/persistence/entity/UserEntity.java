@@ -1,4 +1,6 @@
-package com.GreenFlow.v1.model;
+package com.GreenFlow.v1.infrastructure.adapter.out.persistence.entity;
+
+import com.GreenFlow.v1.domain.model.Role;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -14,16 +16,18 @@ import lombok.Setter;
 
 @Entity
 @Table(name = "users")
-@Getter @Setter
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class User {
+public class UserEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String username;
     private String password;
+
     @Enumerated(EnumType.STRING)
     private Role role;
 }

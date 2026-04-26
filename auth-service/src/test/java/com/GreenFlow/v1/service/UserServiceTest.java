@@ -1,6 +1,8 @@
 package com.GreenFlow.v1.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -13,44 +15,55 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.GreenFlow.v1.dto.UserDTO;
-import com.GreenFlow.v1.exception.NotFoundException;
-import com.GreenFlow.v1.model.Role;
-import com.GreenFlow.v1.model.User;
-import com.GreenFlow.v1.respository.UserRepository;
+import com.GreenFlow.v1.application.port.out.PasswordEncoderPort;
+import com.GreenFlow.v1.application.port.out.UserPersistencePort;
+import com.GreenFlow.v1.application.service.UserApplicationService;
+import com.GreenFlow.v1.domain.exception.UserNotFoundException;
+import com.GreenFlow.v1.domain.model.Role;
+import com.GreenFlow.v1.domain.model.User;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
 
     @Mock
-    private UserRepository userRepository;
+    private UserPersistencePort userPersistencePort;
+
+    @Mock
+    private PasswordEncoderPort passwordEncoderPort;
 
     @InjectMocks
-    private UserService userService;
+    private UserApplicationService userService;
 
     @Test
     void createUser_shouldSaveUserAndReturnDto() {
-        UserDTO dto = UserDTO.builder()
+        User user = User.builder()
                 .username("Test1")
                 .password("Password")
                 .role(Role.ROLE_USER)
                 .build();
-        when(userRepository.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(passwordEncoderPort.encode("Password")).thenReturn("encoded-password");
+        when(userPersistencePort.save(any(User.class))).thenAnswer(invocation -> {
+            User persistedUser = invocation.getArgument(0);
+            persistedUser.setId(1L);
+            return persistedUser;
+        });
 
-        UserDTO result = userService.createUser(dto);
+        User result = userService.createUser(user);
 
+        assertEquals(1L, result.getId());
         assertEquals("Test1", result.getUsername());
-        assertEquals("Password", result.getPassword());
+        assertEquals("encoded-password", result.getPassword());
         assertEquals(Role.ROLE_USER, result.getRole());
-        verify(userRepository).save(any(User.class));
+        verify(passwordEncoderPort).encode("Password");
+        verify(userPersistencePort).save(any(User.class));
     }
 
     @Test
     void getUserById_whenUserExists_shouldReturnDto() {
         User user = new User(1L, "Test1", "Password", Role.ROLE_USER);
-        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        when(userPersistencePort.findById(1L)).thenReturn(Optional.of(user));
 
-        UserDTO result = userService.getUserById(1L);
+        User result = userService.getUserById(1L);
 
         assertEquals(1L, result.getId());
         assertEquals("Test1", result.getUsername());
@@ -59,12 +72,10 @@ class UserServiceTest {
 
     @Test
     void getUserById_whenUserNotFound_shouldThrowNotFoundException() {
-        when(userRepository.findById(1L)).thenReturn(Optional.empty());
+        when(userPersistencePort.findById(1L)).thenReturn(Optional.empty());
 
-        try {
-            userService.getUserById(1L);
-        } catch (NotFoundException ex) {
-            assertEquals("User not found", ex.getMessage());
-        }
+        UserNotFoundException exception = assertThrows(UserNotFoundException.class, () -> userService.getUserById(1L));
+
+        assertEquals("User not found with id: 1", exception.getMessage());
     }
 }

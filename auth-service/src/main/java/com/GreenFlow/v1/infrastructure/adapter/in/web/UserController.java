@@ -1,4 +1,4 @@
-package com.GreenFlow.v1.controller;
+package com.GreenFlow.v1.infrastructure.adapter.in.web;
 
 import java.util.List;
 
@@ -17,26 +17,28 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.GreenFlow.v1.dto.UserDTO;
-import com.GreenFlow.v1.service.IUserService;
-
+import com.GreenFlow.v1.application.port.in.UserUseCase;
+import com.GreenFlow.v1.infrastructure.adapter.in.web.dto.UserDTO;
+import com.GreenFlow.v1.infrastructure.adapter.in.web.mapper.UserWebMapper;
 
 @RestController
 @RequestMapping("/api/v1/users")
-@Tag(name = "Users", description = "Operaciones de gestión de usuarios")
+@Tag(name = "Users", description = "Operaciones de gestion de usuarios")
 public class UserController {
 
-    public final IUserService userService;
+    private final UserUseCase userUseCase;
 
-    public UserController(IUserService userService) {
-        this.userService = userService;
+    public UserController(UserUseCase userUseCase) {
+        this.userUseCase = userUseCase;
     }
 
     @Operation(summary = "Listar todos los usuarios")
     @ApiResponse(responseCode = "200", description = "Lista de usuarios obtenida correctamente")
     @GetMapping("/list")
     public ResponseEntity<List<UserDTO>> getAllUsers() {
-        List<UserDTO> users = userService.getAllUsers();
+        List<UserDTO> users = userUseCase.getAllUsers().stream()
+                .map(UserWebMapper::toDto)
+                .toList();
         return ResponseEntity.ok(users);
     }
 
@@ -48,15 +50,15 @@ public class UserController {
     @GetMapping("/get/{id}")
     public ResponseEntity<UserDTO> getUserById(
             @Parameter(description = "ID del usuario") @PathVariable Long id) {
-        UserDTO user = userService.getUserById(id);
+        UserDTO user = UserWebMapper.toDto(userUseCase.getUserById(id));
         return ResponseEntity.ok(user);
     }
 
     @Operation(summary = "Crear un nuevo usuario")
     @ApiResponse(responseCode = "200", description = "Usuario creado correctamente")
     @PostMapping("/create")
-    public ResponseEntity<UserDTO> createUser(@RequestBody UserDTO userDTO){
-        UserDTO createdUser = userService.createUser(userDTO);
+    public ResponseEntity<UserDTO> createUser(@RequestBody UserDTO userDTO) {
+        UserDTO createdUser = UserWebMapper.toDto(userUseCase.createUser(UserWebMapper.toDomain(userDTO)));
         return ResponseEntity.ok(createdUser);
     }
 
@@ -69,7 +71,7 @@ public class UserController {
     public ResponseEntity<UserDTO> updateUser(
             @Parameter(description = "ID del usuario") @PathVariable Long id,
             @RequestBody UserDTO userDTO) {
-        UserDTO updatedUser = userService.updateUser(id, userDTO);
+        UserDTO updatedUser = UserWebMapper.toDto(userUseCase.updateUser(id, UserWebMapper.toDomain(userDTO)));
         return ResponseEntity.ok(updatedUser);
     }
 
@@ -81,8 +83,7 @@ public class UserController {
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> deleteUser(
             @Parameter(description = "ID del usuario") @PathVariable Long id) {
-        userService.deleteUser(id);
+        userUseCase.deleteUser(id);
         return ResponseEntity.noContent().build();
     }
-
 }

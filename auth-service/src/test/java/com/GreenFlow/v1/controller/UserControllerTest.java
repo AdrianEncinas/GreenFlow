@@ -16,15 +16,17 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import com.GreenFlow.v1.dto.UserDTO;
-import com.GreenFlow.v1.model.Role;
-import com.GreenFlow.v1.service.IUserService;
+import com.GreenFlow.v1.application.port.in.UserUseCase;
+import com.GreenFlow.v1.domain.model.Role;
+import com.GreenFlow.v1.domain.model.User;
+import com.GreenFlow.v1.infrastructure.adapter.in.web.UserController;
+import com.GreenFlow.v1.infrastructure.adapter.in.web.dto.UserDTO;
 
 @ExtendWith(MockitoExtension.class)
 class UserControllerTest {
 
     @Mock
-    private IUserService userService;
+    private UserUseCase userUseCase;
 
     @InjectMocks
     private UserController userController;
@@ -37,30 +39,35 @@ class UserControllerTest {
                 .password("Password")
                 .role(Role.ROLE_USER)
                 .build();
-        when(userService.createUser(any(UserDTO.class))).thenReturn(dto);
+        User createdUser = User.builder()
+            .id(1L)
+            .username("Test1")
+            .role(Role.ROLE_USER)
+            .build();
+        when(userUseCase.createUser(any(User.class))).thenReturn(createdUser);
 
         ResponseEntity<UserDTO> response = userController.createUser(dto);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertSame(dto, response.getBody());
-        verify(userService).createUser(any());
+        assertEquals(1L, response.getBody().getId());
+        assertEquals("Test1", response.getBody().getUsername());
+        verify(userUseCase).createUser(any(User.class));
     }
 
     @Test
     void getAllUsers_shouldReturnUserList() {
-        UserDTO dto = UserDTO.builder()
-                .id(1L)
-                .username("Test1")
-                .password("Password")
-                .role(Role.ROLE_USER)
+        User user = User.builder()
+            .id(1L)
+            .username("Test1")
+            .role(Role.ROLE_USER)
                 .build();
-        when(userService.getAllUsers()).thenReturn(List.of(dto));
+        when(userUseCase.getAllUsers()).thenReturn(List.of(user));
 
         ResponseEntity<List<UserDTO>> response = userController.getAllUsers();
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(1, response.getBody().size());
         assertEquals("Test1", response.getBody().get(0).getUsername());
-        verify(userService).getAllUsers();
+        verify(userUseCase).getAllUsers();
     }
 }
