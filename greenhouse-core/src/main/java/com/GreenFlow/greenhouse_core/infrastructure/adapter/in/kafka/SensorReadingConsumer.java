@@ -23,20 +23,20 @@ public class SensorReadingConsumer {
     )
     public void consume(SensorReading reading) {
         log.info("Received sensor reading from [{}]: temp={}, humidity={}, co2={}",
-                reading.getSensorId(),
-                reading.getTemperature(),
-                reading.getHumidity(),
-                reading.getCo2Level());
-
+                reading.id(),
+                reading.temperature(),
+                reading.humidity(),
+                reading.co2Level());
+        
         String consoleMessage = String.format(
                 "[KAFKA] sensorId=%s temp=%.2f humidity=%.2f co2=%.2f timestamp=%s",
-                reading.getSensorId(),
-                reading.getTemperature(),
-                reading.getHumidity(),
-                reading.getCo2Level(),
-                reading.getTimestamp() == null
+                reading.id(),
+                reading.temperature(),
+                reading.humidity(),
+                reading.co2Level(),
+                reading.timestamp() == null
                         ? "null"
-                        : DateTimeFormatter.ISO_INSTANT.format(reading.getTimestamp())
+                        : DateTimeFormatter.ISO_INSTANT.format(reading.timestamp())
         );
         System.out.println(consoleMessage);
 
