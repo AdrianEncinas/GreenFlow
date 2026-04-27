@@ -1,6 +1,7 @@
 package com.GreenFlow.greenhouse_core.infrastructure.adapter.out.persistence.entity;
 
-import com.GreenFlow.greenhouse_core.domain.model.SensorReading;
+import java.time.Instant;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -11,8 +12,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.time.Instant;
 
 @Entity
 @Table(name = "sensor_readings")
