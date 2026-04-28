@@ -38,7 +38,7 @@ public class SensorReadingConsumer {
                         ? "null"
                         : DateTimeFormatter.ISO_INSTANT.format(reading.timestamp())
         );
-        System.out.println(consoleMessage);
+        log.info(consoleMessage);
 
         sensorReadingUseCase.saveReading(reading);
     }
