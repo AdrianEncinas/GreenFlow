@@ -8,10 +8,21 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import com.GreenFlow.v1.domain.exception.InvalidCredentialsException;
 import com.GreenFlow.v1.domain.exception.UserNotFoundException;
 
 @RestControllerAdvice
 public class RestExceptionHandler {
+
+    @ExceptionHandler(InvalidCredentialsException.class)
+    public ResponseEntity<Map<String, Object>> handleInvalidCredentials(InvalidCredentialsException exception) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(Map.of(
+                        "timestamp", Instant.now().toString(),
+                        "status", HttpStatus.UNAUTHORIZED.value(),
+                        "error", HttpStatus.UNAUTHORIZED.getReasonPhrase(),
+                        "message", exception.getMessage()));
+    }
 
     @ExceptionHandler(UserNotFoundException.class)
     public ResponseEntity<Map<String, Object>> handleUserNotFound(UserNotFoundException exception) {

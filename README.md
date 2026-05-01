@@ -7,8 +7,8 @@ GreenFlow es una plataforma backend orientada a agricultura inteligente, organiz
 | Servicio | Puerto | Descripcion |
 |---|---|---|
 | `auth-service` | 8080 | Gestion de usuarios y autenticacion |
-| `sensor-service` | 8082 | Generacion y publicacion de lecturas de sensores |
-| `greenhouse-core` | 8081 | Consumo de eventos Kafka y persistencia de lecturas |
+| `sensor-service` | 8085 | Generacion y publicacion de lecturas de sensores |
+| `greenhouse-core` | 8082 | Consumo de eventos Kafka y persistencia de lecturas |
 
 ---
 
@@ -70,6 +70,44 @@ SensorScheduler (cada 10s)
 | DELETE | `/delete/{id}` | Eliminar usuario |
 
 Swagger UI disponible en: `http://localhost:8080/swagger-ui.html`
+
+## Autorizacion JWT entre microservicios
+
+Todos los endpoints protegidos de `auth-service`, `greenhouse-core` y `sensor-service`
+validan un token JWT emitido por `auth-service` en el login.
+
+### 1. Crear usuario inicial (publico)
+
+```bash
+curl -X POST http://localhost:8080/api/v1/users/create \
+  -H "Content-Type: application/json" \
+  -d '{"username":"admin","password":"admin123","role":"ROLE_ADMIN"}'
+```
+
+### 2. Login en auth-service
+
+```bash
+curl -X POST http://localhost:8080/api/v1/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"username":"admin","password":"admin123"}'
+```
+
+Respuesta esperada:
+
+```json
+{
+  "token": "eyJhbGciOiJIUzI1NiJ9..."
+}
+```
+
+### 3. Usar Bearer token en servicios protegidos
+
+```bash
+curl http://localhost:8082/api/v1/sensor-readings/list \
+  -H "Authorization: Bearer <TOKEN>"
+```
+
+Si no se envia token, el servicio responde `401 Unauthorized`.
 
 ## API - greenhouse-core (`/api/v1/sensor-readings`)
 
