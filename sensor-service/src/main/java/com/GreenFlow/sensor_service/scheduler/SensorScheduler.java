@@ -23,7 +23,7 @@ public class SensorScheduler {
             "sensor-001", "sensor-002", "sensor-003"
     );
 
-    @Scheduled(fixedRateString = "${sensor.scheduler.fixed-rate-ms:10000}")
+    @Scheduled(fixedRateString = "${sensor.scheduler.fixed-rate-ms:300000}")
     public void publishSensorReadings() {
         SENSOR_IDS.forEach(sensorId -> {
             SensorReading reading = SensorReading.builder()
