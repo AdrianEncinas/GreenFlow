@@ -1,0 +1,355 @@
+{
+  "info": {
+    "name": "GreenFlow API",
+    "description": "Coleccion Postman para auth-service y greenhouse-core del proyecto GreenFlow.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_postman_id": "3e932ce6-a0c6-46c1-89db-66d356f22a6f"
+  },
+  "variable": [
+    {
+      "key": "auth_base_url",
+      "value": "http://localhost:8080"
+    },
+    {
+      "key": "greenhouse_base_url",
+      "value": "http://localhost:8082"
+    },
+    {
+      "key": "jwt_token",
+      "value": ""
+    },
+    {
+      "key": "user_id",
+      "value": "1"
+    },
+    {
+      "key": "sensor_reading_id",
+      "value": "1"
+    },
+    {
+      "key": "sensor_id",
+      "value": "SENSOR-001"
+    }
+  ],
+  "item": [
+    {
+      "name": "Auth Service",
+      "description": "Endpoints de usuarios y autenticacion (auth-service, puerto 8080).",
+      "item": [
+        {
+          "name": "Crear Usuario",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"admin123\",\n  \"role\": \"ROLE_ADMIN\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{auth_base_url}}/api/v1/users/create",
+              "host": [
+                "{{auth_base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "users",
+                "create"
+              ]
+            },
+            "description": "Crea un usuario inicial para poder hacer login y obtener JWT."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status es 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "var data = {};",
+                  "try {",
+                  "  data = pm.response.json();",
+                  "} catch (e) {}",
+                  "",
+                  "if (data && data.id) {",
+                  "  pm.collectionVariables.set('user_id', String(data.id));",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"admin123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{auth_base_url}}/api/v1/auth/login",
+              "host": [
+                "{{auth_base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Obtiene el JWT y lo guarda en la variable jwt_token."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status es 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "var data = {};",
+                  "try {",
+                  "  data = pm.response.json();",
+                  "} catch (e) {}",
+                  "",
+                  "if (data && data.token) {",
+                  "  pm.collectionVariables.set('jwt_token', data.token);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Listar Usuarios",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{auth_base_url}}/api/v1/users/list",
+              "host": [
+                "{{auth_base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "users",
+                "list"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener Usuario por ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{auth_base_url}}/api/v1/users/get/{{user_id}}",
+              "host": [
+                "{{auth_base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "users",
+                "get",
+                "{{user_id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Actualizar Usuario",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"admin_updated\",\n  \"password\": \"admin123\",\n  \"role\": \"ROLE_ADMIN\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{auth_base_url}}/api/v1/users/update/{{user_id}}",
+              "host": [
+                "{{auth_base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "users",
+                "update",
+                "{{user_id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Eliminar Usuario",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{auth_base_url}}/api/v1/users/delete/{{user_id}}",
+              "host": [
+                "{{auth_base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "users",
+                "delete",
+                "{{user_id}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Greenhouse Core",
+      "description": "Endpoints de lecturas de sensores (greenhouse-core, puerto 8082).",
+      "item": [
+        {
+          "name": "Listar Lecturas",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{greenhouse_base_url}}/api/v1/sensor-readings/list",
+              "host": [
+                "{{greenhouse_base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "sensor-readings",
+                "list"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener Lectura por ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{greenhouse_base_url}}/api/v1/sensor-readings/get/{{sensor_reading_id}}",
+              "host": [
+                "{{greenhouse_base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "sensor-readings",
+                "get",
+                "{{sensor_reading_id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener Lecturas por Sensor",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{greenhouse_base_url}}/api/v1/sensor-readings/sensor/{{sensor_id}}",
+              "host": [
+                "{{greenhouse_base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "sensor-readings",
+                "sensor",
+                "{{sensor_id}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
