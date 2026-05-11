@@ -139,6 +139,16 @@ GreenFlow/
 docker compose up -d
 ```
 
+Si aparece el warning de Kafka `Connection to node -1 (localhost:9092) could not be established`, normalmente significa que Docker Desktop no esta iniciado o que Kafka no esta levantado.
+
+Validacion rapida:
+
+```bash
+docker compose ps
+```
+
+Debes ver `greenflow-kafka`, `greenflow-zookeeper` y `greenflow-postgres` en estado `running`.
+
 ### 2. Iniciar microservicios (en este orden)
 
 ```bash
@@ -181,4 +191,16 @@ Cobertura de tests:
 ## Objetivo del proyecto
 
 Separar responsabilidades en servicios independientes para mejorar escalabilidad, mantenimiento y despliegue continuo.
+
+## Seguridad JWT (estado actual)
+
+- `auth-service`: permite publico solo `/api/v1/auth/**` y `/api/v1/users/create`.
+- `greenhouse-core`: requiere `Authorization: Bearer <TOKEN>` para endpoints de negocio.
+- `sensor-service`: requiere JWT para cualquier endpoint salvo `/actuator/health`.
+
+Variables de entorno utiles:
+
+- `JWT_SECRET` (compartida entre servicios)
+- `JWT_EXPIRATION_MS` (auth-service)
+- `KAFKA_BOOTSTRAP_SERVERS` (por defecto `localhost:9092`)
 
