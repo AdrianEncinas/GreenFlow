@@ -1,7 +1,7 @@
 {
   "info": {
     "name": "GreenFlow API",
-    "description": "Coleccion Postman para auth-service y greenhouse-core del proyecto GreenFlow.",
+    "description": "Coleccion Postman para validar la arquitectura de microservicios de GreenFlow con JWT centralizado en auth-service.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
     "_postman_id": "3e932ce6-a0c6-46c1-89db-66d356f22a6f"
   },
@@ -15,8 +15,16 @@
       "value": "http://localhost:8083"
     },
     {
+      "key": "sensor_base_url",
+      "value": "http://localhost:8085"
+    },
+    {
       "key": "jwt_token",
       "value": ""
+    },
+    {
+      "key": "jwt_issuer",
+      "value": "greenflow-auth-service"
     },
     {
       "key": "user_id",
@@ -144,6 +152,10 @@
                   "",
                   "if (data && data.token) {",
                   "  pm.collectionVariables.set('jwt_token', data.token);",
+                  "}",
+                  "",
+                  "pm.test('JWT guardado en variable de coleccion', function () {",
+                  "  pm.expect(pm.collectionVariables.get('jwt_token')).to.be.a('string').and.not.empty;",
                   "}"
                 ]
               }
@@ -264,7 +276,20 @@
               ]
             }
           },
-          "response": []
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status es 204', function () {",
+                  "  pm.response.to.have.status(204);",
+                  "});"
+                ]
+              }
+            }
+          ]
         }
       ]
     },
@@ -348,6 +373,116 @@
             }
           },
           "response": []
+        }
+      ]
+    },
+    {
+      "name": "Sensor Service",
+      "description": "Endpoints de sensor-service (puerto 8085).",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{sensor_base_url}}/actuator/health",
+              "host": [
+                "{{sensor_base_url}}"
+              ],
+              "path": [
+                "actuator",
+                "health"
+              ]
+            },
+            "description": "Endpoint publico para validar que sensor-service esta vivo."
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status es 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Security Checks",
+      "description": "Pruebas para validar que sin JWT no se puede acceder a endpoints protegidos.",
+      "item": [
+        {
+          "name": "Greenhouse sin token => 401",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{greenhouse_base_url}}/api/v1/sensor-readings/list",
+              "host": [
+                "{{greenhouse_base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "sensor-readings",
+                "list"
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status es 401', function () {",
+                  "  pm.response.to.have.status(401);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Auth list users sin token => 401",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{auth_base_url}}/api/v1/users/list",
+              "host": [
+                "{{auth_base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "users",
+                "list"
+              ]
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status es 401', function () {",
+                  "  pm.response.to.have.status(401);",
+                  "});"
+                ]
+              }
+            }
+          ]
         }
       ]
     }
