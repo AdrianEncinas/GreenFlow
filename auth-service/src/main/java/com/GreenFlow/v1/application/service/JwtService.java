@@ -20,12 +20,15 @@ public class JwtService {
 
     private final String secret;
     private final long expirationMs;
+    private final String issuer;
 
     public JwtService(
             @Value("${jwt.secret}") String secret,
-            @Value("${jwt.expiration-ms}") long expirationMs) {
+            @Value("${jwt.expiration-ms}") long expirationMs,
+            @Value("${jwt.issuer}") String issuer) {
         this.secret = secret;
         this.expirationMs = expirationMs;
+        this.issuer = issuer;
     }
 
     public String generateToken(User user) {
@@ -34,6 +37,7 @@ public class JwtService {
 
         return Jwts.builder()
                 .setSubject(user.getUsername())
+            .setIssuer(issuer)
                 .claim("role", user.getRole().name())
                 .setIssuedAt(now)
                 .setExpiration(expiration)

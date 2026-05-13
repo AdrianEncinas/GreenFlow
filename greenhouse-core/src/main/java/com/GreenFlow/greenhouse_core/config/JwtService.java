@@ -16,9 +16,13 @@ import io.jsonwebtoken.security.Keys;
 public class JwtService {
 
     private final String secret;
+    private final String issuer;
 
-    public JwtService(@Value("${jwt.secret}") String secret) {
+    public JwtService(
+            @Value("${jwt.secret}") String secret,
+            @Value("${jwt.issuer}") String issuer) {
         this.secret = secret;
+        this.issuer = issuer;
     }
 
     public String extractUsername(String token) {
@@ -31,8 +35,12 @@ public class JwtService {
     }
 
     public boolean isTokenValid(String token) {
-        Date expiration = extractAllClaims(token).getExpiration();
-        return expiration != null && expiration.after(new Date());
+        Claims claims = extractAllClaims(token);
+        Date expiration = claims.getExpiration();
+        String tokenIssuer = claims.getIssuer();
+        return expiration != null
+                && expiration.after(new Date())
+                && issuer.equals(tokenIssuer);
     }
 
     private Claims extractAllClaims(String token) {

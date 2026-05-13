@@ -76,6 +76,10 @@ Swagger UI disponible en: `http://localhost:8080/swagger-ui.html`
 Todos los endpoints protegidos de `auth-service`, `greenhouse-core` y `sensor-service`
 validan un token JWT emitido por `auth-service` en el login.
 
+Ademas, `greenhouse-core` y `sensor-service` validan que el claim `iss` del token
+sea exactamente `greenflow-auth-service`, para aceptar solo tokens emitidos por
+`auth-service`.
+
 ### 1. Crear usuario inicial (publico)
 
 ```bash
@@ -201,6 +205,7 @@ Separar responsabilidades en servicios independientes para mejorar escalabilidad
 Variables de entorno utiles:
 
 - `JWT_SECRET` (compartida entre servicios)
+- `JWT_ISSUER` (emisor esperado en todos los servicios, por defecto `greenflow-auth-service`)
 - `JWT_EXPIRATION_MS` (auth-service)
 - `KAFKA_BOOTSTRAP_SERVERS` (por defecto `localhost:9092`)
 

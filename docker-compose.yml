@@ -68,6 +68,7 @@ services:
       SERVER_PORT: 8080
       JWT_SECRET: greenflow-super-secret-key-please-change-in-production-2026
       JWT_EXPIRATION_MS: 3600000
+      JWT_ISSUER: greenflow-auth-service
 
   greenhouse-core:
     build:
@@ -87,6 +88,7 @@ services:
       SPRING_DATASOURCE_PASSWORD: root
       KAFKA_BOOTSTRAP_SERVERS: kafka:29092
       JWT_SECRET: greenflow-super-secret-key-please-change-in-production-2026
+      JWT_ISSUER: greenflow-auth-service
 
   sensor-service:
     build:
@@ -101,6 +103,7 @@ services:
       SERVER_PORT: 8085
       KAFKA_BOOTSTRAP_SERVERS: kafka:29092
       JWT_SECRET: greenflow-super-secret-key-please-change-in-production-2026
+      JWT_ISSUER: greenflow-auth-service
 
 volumes:
   zookeeper_data:
