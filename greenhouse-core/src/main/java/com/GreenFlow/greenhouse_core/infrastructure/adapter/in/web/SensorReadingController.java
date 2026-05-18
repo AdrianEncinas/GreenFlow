@@ -2,6 +2,7 @@ package com.GreenFlow.greenhouse_core.infrastructure.adapter.in.web;
 
 import com.GreenFlow.greenhouse_core.application.port.in.SensorReadingUseCase;
 import com.GreenFlow.greenhouse_core.infrastructure.adapter.in.web.dto.SensorReadingDTO;
+import com.GreenFlow.greenhouse_core.infrastructure.adapter.in.web.dto.SensorReadingsSummaryDTO;
 import com.GreenFlow.greenhouse_core.infrastructure.adapter.in.web.mapper.SensorReadingWebMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -41,5 +42,10 @@ public class SensorReadingController {
                 .map(SensorReadingWebMapper::toDto)
                 .toList();
         return ResponseEntity.ok(readings);
+    }
+
+    @GetMapping("/summary")
+    public ResponseEntity<SensorReadingsSummaryDTO> getSummary() {
+        return ResponseEntity.ok(sensorReadingUseCase.getSummary());
     }
 }

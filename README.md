@@ -2,6 +2,8 @@
 
 GreenFlow es una plataforma backend orientada a agricultura inteligente, organizada como monorepo con arquitectura de microservicios en Java y Spring Boot.
 
+Ahora incluye un frontend en Angular 21 para analisis visual de sensores y seguimiento del estado de cultivos.
+
 ## Microservicios
 
 | Servicio | Puerto | Descripcion |
@@ -9,6 +11,7 @@ GreenFlow es una plataforma backend orientada a agricultura inteligente, organiz
 | `auth-service` | 8080 | Gestion de usuarios y autenticacion |
 | `sensor-service` | 8085 | Generacion y publicacion de lecturas de sensores |
 | `greenhouse-core` | 8082 | Consumo de eventos Kafka y persistencia de lecturas |
+| `frontend` | 4200 | Dashboard web para monitoreo de cultivos |
 
 ---
 
@@ -119,7 +122,48 @@ Si no se envia token, el servicio responde `401 Unauthorized`.
 |---|---|---|
 | GET | `/list` | Listar todas las lecturas |
 | GET | `/get/{id}` | Obtener lectura por ID |
-| GET | `/by-sensor/{sensorId}` | Lecturas de un sensor especifico |
+| GET | `/sensor/{sensorId}` | Lecturas de un sensor especifico |
+| GET | `/summary` | Resumen operativo para dashboard (promedios, alertas, ultimos valores) |
+
+## Frontend - Angular 21 (`frontend/`)
+
+Funcionalidades incluidas:
+
+- Login con JWT contra `auth-service`.
+- Dashboard con KPIs: total lecturas, sensores activos, promedios y alertas criticas.
+- Grafica de tendencias (temperatura, humedad y CO2).
+- Filtro por sensor y ventana de ultimos registros.
+- Tabla de ultimas lecturas.
+- Panel de alertas inteligentes con umbrales de riesgo.
+
+### Ejecucion del frontend
+
+```bash
+cd frontend
+npm install
+npm start
+```
+
+Aplicacion disponible en `http://localhost:4200`.
+
+### Usuario inicial sugerido
+
+Si aun no existe usuario, crealo primero:
+
+```bash
+curl -X POST http://localhost:8080/api/v1/users/create \
+  -H "Content-Type: application/json" \
+  -d '{"username":"admin","password":"admin123","role":"ROLE_ADMIN"}'
+```
+
+Tambien se crea automaticamente un usuario inicial al arrancar `auth-service`:
+
+- usuario: `admin`
+- password: `admin123`
+
+Si quieres desactivar este bootstrap automatico, configura:
+
+- `BOOTSTRAP_ADMIN_ENABLED=false`
 
 ---
 
@@ -141,6 +185,12 @@ GreenFlow/
 
 ```bash
 docker compose up -d
+```
+
+Para levantar tambien el frontend en contenedor:
+
+```bash
+docker compose up -d --build frontend
 ```
 
 Si aparece el warning de Kafka `Connection to node -1 (localhost:9092) could not be established`, normalmente significa que Docker Desktop no esta iniciado o que Kafka no esta levantado.

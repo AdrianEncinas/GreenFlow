@@ -1,0 +1,83 @@
+<main class="login-page">
+  <section class="login-panel">
+    <div class="intro-grid">
+      <div>
+        <p class="eyebrow">Monitoreo Agricola Inteligente</p>
+        <h1>GreenFlow Control Center</h1>
+        <p class="subtitle">
+          Accede al dashboard o crea tu cuenta desde este mismo apartado para empezar a visualizar el estado de los cultivos.
+        </p>
+      </div>
+
+      <aside class="quick-access-card">
+        <p class="quick-title">Acceso inicial</p>
+        <p class="quick-text">Si es tu primer ingreso, puedes usar el usuario precargado o registrarte abajo.</p>
+        <div class="credentials">
+          <span>Usuario: <strong>admin</strong></span>
+          <span>Clave: <strong>admin123</strong></span>
+        </div>
+        <button type="button" class="secondary-btn" (click)="useDemoAccess()">
+          Usar acceso rapido
+        </button>
+      </aside>
+    </div>
+
+    <div class="auth-tabs" role="tablist" aria-label="Autenticacion">
+      <button
+        type="button"
+        class="tab-btn"
+        [class.active]="!isRegisterMode"
+        (click)="setMode(false)">
+        Iniciar sesion
+      </button>
+      <button
+        type="button"
+        class="tab-btn"
+        [class.active]="isRegisterMode"
+        (click)="setMode(true)">
+        Registrarse
+      </button>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="submit()" class="login-form">
+      <p class="section-title">
+        {{ isRegisterMode ? 'Crea un nuevo usuario desde el frontend' : 'Ingresa con una cuenta existente' }}
+      </p>
+
+      <label>
+        Usuario
+        <input type="text" formControlName="username" [placeholder]="isRegisterMode ? 'nuevo-usuario' : 'admin'" />
+      </label>
+
+      <label>
+        Contrasena
+        <input type="password" formControlName="password" placeholder="******" />
+      </label>
+
+      @if (isRegisterMode) {
+      <label>
+        Confirmar contrasena
+        <input type="password" formControlName="confirmPassword" placeholder="******" />
+      </label>
+      }
+
+      @if (error) {
+      <p class="error">{{ error }}</p>
+      }
+
+      @if (!isRegisterMode) {
+      <p class="helper-text">
+        Si no tienes cuenta aun, cambia a <strong>Registrarse</strong> para crear un usuario antes de entrar y evitar el 401 por credenciales inexistentes.
+      </p>
+      }
+
+      <button type="submit" [disabled]="loading">
+        @if (loading) {
+          Procesando...
+        } @else {
+          {{ isRegisterMode ? 'Registrarme e ingresar' : 'Entrar al dashboard' }}
+        }
+      </button>
+    </form>
+  </section>
+</main>

@@ -1,0 +1,170 @@
+<main class="dashboard-page">
+  <header class="topbar">
+    <div>
+      <p class="eyebrow">GreenFlow</p>
+      <h1>Estado de Cultivos y Sensores</h1>
+      <p class="hint">Control central de telemetria para decisiones rapidas en campo.</p>
+    </div>
+    <div class="actions">
+      <button type="button" class="secondary" (click)="refresh()">Actualizar</button>
+      <button type="button" class="danger" (click)="logout()">Cerrar sesion</button>
+    </div>
+  </header>
+
+  @if (error) {
+  <section class="error-panel">{{ error }}</section>
+  }
+
+  @if (summary; as stats) {
+  <section class="kpi-grid">
+    <article class="kpi-card">
+      <p>Total lecturas</p>
+      <h3>{{ stats.totalReadings }}</h3>
+    </article>
+    <article class="kpi-card">
+      <p>Sensores activos</p>
+      <h3>{{ stats.totalSensors }}</h3>
+    </article>
+    <article class="kpi-card warm">
+      <p>Temp. media</p>
+      <h3>{{ stats.averageTemperature | number: '1.1-1' }} C</h3>
+    </article>
+    <article class="kpi-card moist">
+      <p>Humedad media</p>
+      <h3>{{ stats.averageHumidity | number: '1.1-1' }} %</h3>
+    </article>
+    <article class="kpi-card sky">
+      <p>CO2 medio</p>
+      <h3>{{ stats.averageCo2Level | number: '1.0-0' }} ppm</h3>
+    </article>
+    <article class="kpi-card alert">
+      <p>Alertas criticas</p>
+      <h3>{{ stats.criticalAlerts }}</h3>
+    </article>
+  </section>
+  }
+
+  <section class="filters">
+    <label>
+      Sensor
+      <select [(ngModel)]="selectedSensor" (change)="applyFilters()">
+        <option value="all">Todos</option>
+        @for (sensor of sensors; track sensor) {
+        <option [value]="sensor">{{ sensor }}</option>
+        }
+      </select>
+    </label>
+
+    <label>
+      Registros
+      <select [(ngModel)]="lastRecords" (change)="applyFilters()">
+        <option [ngValue]="24">Ultimos 24</option>
+        <option [ngValue]="48">Ultimos 48</option>
+        <option [ngValue]="96">Ultimos 96</option>
+      </select>
+    </label>
+  </section>
+
+  <section class="chart-grid">
+    <article class="panel chart-panel warm-chart">
+      <div class="panel-title">
+        <h2>Temperatura</h2>
+        <p>Escala ajustada automaticamente para mostrar cambios pequenos.</p>
+      </div>
+      <div class="chart-wrapper">
+        <canvas
+          baseChart
+          [data]="temperatureChartData"
+          [options]="temperatureChartOptions"
+          [type]="'line'"></canvas>
+      </div>
+    </article>
+
+    <article class="panel chart-panel moist-chart">
+      <div class="panel-title">
+        <h2>Humedad</h2>
+        <p>Visualizacion independiente para detectar oscilaciones leves.</p>
+      </div>
+      <div class="chart-wrapper">
+        <canvas
+          baseChart
+          [data]="humidityChartData"
+          [options]="humidityChartOptions"
+          [type]="'line'"></canvas>
+      </div>
+    </article>
+
+    <article class="panel chart-panel sky-chart">
+      <div class="panel-title">
+        <h2>CO2</h2>
+        <p>Rango propio para que cada variacion de ppm sea visible.</p>
+      </div>
+      <div class="chart-wrapper">
+        <canvas
+          baseChart
+          [data]="co2ChartData"
+          [options]="co2ChartOptions"
+          [type]="'line'"></canvas>
+      </div>
+    </article>
+  </section>
+
+  <section class="dual-grid">
+    <article class="panel">
+      <div class="panel-title">
+        <h2>Alertas Inteligentes</h2>
+        <p>Reglas: temperatura > 35, humedad < 35, CO2 > 1200.</p>
+      </div>
+
+      @if (alerts.length === 0) {
+      <p class="empty">Sin alertas en el rango seleccionado.</p>
+      } @else {
+      <ul class="alert-list">
+        @for (alert of alerts; track $index) {
+        <li [class]="alert.type">
+          <strong>{{ alert.sensorId }}</strong>
+          <span>{{ alert.message }}: {{ alert.value | number: '1.0-1' }}</span>
+          <small>{{ alert.timestamp | date: 'dd/MM HH:mm' }}</small>
+        </li>
+        }
+      </ul>
+      }
+    </article>
+
+    <article class="panel">
+      <div class="panel-title">
+        <h2>Ultimas Lecturas</h2>
+        <p>Vista operativa para validar estado por sensor.</p>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Sensor</th>
+              <th>Temp.</th>
+              <th>Hum.</th>
+              <th>CO2</th>
+              <th>Fecha</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of displayedReadings; track row.id) {
+            <tr>
+              <td>{{ row.sensorId }}</td>
+              <td>{{ row.temperature | number: '1.0-1' }} C</td>
+              <td>{{ row.humidity | number: '1.0-1' }} %</td>
+              <td>{{ row.co2Level | number: '1.0-0' }} ppm</td>
+              <td>{{ row.timestamp | date: 'dd/MM/yyyy HH:mm:ss' }}</td>
+            </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </article>
+  </section>
+
+  @if (loading) {
+  <div class="loading">Cargando datos...</div>
+  }
+</main>

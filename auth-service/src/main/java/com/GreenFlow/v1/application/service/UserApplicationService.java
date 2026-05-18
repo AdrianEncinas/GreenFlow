@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.GreenFlow.v1.application.port.in.UserUseCase;
 import com.GreenFlow.v1.application.port.out.PasswordEncoderPort;
 import com.GreenFlow.v1.application.port.out.UserPersistencePort;
+import com.GreenFlow.v1.domain.exception.UsernameAlreadyExistsException;
 import com.GreenFlow.v1.domain.exception.UserNotFoundException;
 import com.GreenFlow.v1.domain.model.User;
 
@@ -38,6 +39,11 @@ public class UserApplicationService implements UserUseCase {
     @Override
     @Transactional
     public User createUser(User user) {
+        userPersistencePort.findByUsername(user.getUsername())
+                .ifPresent(existingUser -> {
+                    throw new UsernameAlreadyExistsException(user.getUsername());
+                });
+
         User userToPersist = User.builder()
                 .username(user.getUsername())
                 .password(passwordEncoderPort.encode(user.getPassword()))

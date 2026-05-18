@@ -105,6 +105,16 @@ services:
       JWT_SECRET: greenflow-super-secret-key-please-change-in-production-2026
       JWT_ISSUER: greenflow-auth-service
 
+  frontend:
+    build:
+      context: ./frontend
+    container_name: greenflow-frontend
+    depends_on:
+      - auth-service
+      - greenhouse-core
+    ports:
+      - "4200:80"
+
 volumes:
   zookeeper_data:
   kafka_data:
